@@ -36,10 +36,10 @@ namespace RestaurantSystem.Services
                         CustomerReceptionService OrderTable = new CustomerReceptionService();
                         OrderTable.InitializeReception();
                         break;
-                    //case 2:
-                    //    CustomerOrderServices Order = new CustomerOrderServices();
-                    //    Order.InitializeOrder();
-                    //    break;
+                    case 2:
+                        CustomerOrderService Order = new CustomerOrderService();
+                        Order.InitializeOrder();
+                        break;
                     //case 3:
                     //    CustomerCheckoutServices Checkout = new CustomerCheckoutServices();
                     //    Checkout.InitializeCheckout();

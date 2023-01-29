@@ -1,5 +1,7 @@
 ﻿using RestaurantSystem.Strukts;
 using RestaurantSystem.Utilities;
+using RestaurantSystem.Extentions;
+using RestaurantSystem.Models;
 
 namespace RestaurantSystem.Services
 {
@@ -53,14 +55,14 @@ namespace RestaurantSystem.Services
         private IEnumerable<sTable> GetAvailableTables()
         {
             List<sTable> Tables = SqlService.RetrieveTableList();
-            IEnumerable<sTable> AvailableTables = Tables.Where(table => table.isOrdered == false);
+            IEnumerable<sTable> AvailableTables = Tables.Where(table => !table.isReserved);
             return AvailableTables;
         }
 
         private sTable ChooseTable(int numberOfCustomers, IEnumerable<sTable> availableTables)
         {
             IEnumerable<sTable> TablesForOrder = availableTables.Where(availableSeats => availableSeats.Seats - numberOfCustomers >= 0)
-                                                                       .OrderBy(availableSeats => availableSeats.Seats - numberOfCustomers >= 0);
+                                                                .OrderBy(availableSeats => availableSeats.Seats - numberOfCustomers >= 0);
             return TablesForOrder.FirstOrDefault();
         }
 
@@ -75,15 +77,16 @@ namespace RestaurantSystem.Services
             }
             else
             {
-                Console.ForegroundColor = ConsoleColor.Red;
+                Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine("Nėra laisvo staliuko, tokiam žmonių kiekiui.");
             }
+            Console.ReadLine();
         }
 
         private void CancelReservation()
         {
             List<sTable> Tables = SqlService.RetrieveTableList();
-            IEnumerable<sTable> ReservedTables = Tables.Where(table => table.isReserved == true);
+            IEnumerable<sTable> ReservedTables = Tables.Where(table => table.isReserved);
             if (ReservedTables.Any())
             {
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -93,13 +96,13 @@ namespace RestaurantSystem.Services
                 {
                     ++KeyboardKey;
                     Console.ForegroundColor = ConsoleColor.Blue;
-                    Console.WriteLine($"[{KeyboardKey}] Staliuko numeris: {table.TableID}");
+                    Console.WriteLine($"[{KeyboardKey}] Staliuko numeris: {table.TableID} ({table.OccupiedSeats} {(table.OccupiedSeats > 1 ? " žmonės" : " žmogus")})");
                 }
-                InputValidation.ValidateInput(KeyboardKey);
-                string SqlString = $"UPDATE tables SET isReserved='false', OccupiedSeats=0 WHERE TableID={ReservedTables.ElementAt(KeyboardKey - 1).TableID};";
+                int Input = InputValidation.ValidateInput(ReservedTables.Count());
+                string SqlString = $"UPDATE tables SET isReserved='false', OccupiedSeats=0 WHERE TableID={ReservedTables.ElementAt(Input - 1).TableID};";
                 SqlService.UpdateSqlTable(SqlString);
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"Staliukas Nr. {ReservedTables.ElementAt(KeyboardKey - 1).TableID} atrezervuotas.");
+                Console.WriteLine($"Staliukas Nr. {ReservedTables.ElementAt(Input - 1).TableID} atrezervuotas.");
             }
             else
             {

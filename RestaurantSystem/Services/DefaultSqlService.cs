@@ -7,7 +7,7 @@ namespace RestaurantSystem.Services
 {
     public class DefaultSqlService
     {
-        public List<Table> Tables = new List<Table>() {new Table(2),
+        private List<Table> Tables = new List<Table>() {new Table(2),
                                                          new Table(2),
                                                          new Table(4),
                                                          new Table(4),
@@ -16,29 +16,31 @@ namespace RestaurantSystem.Services
                                                          new Table(6),
                                                          new Table(8)};
 
-        internal List<Meal> Menu = new List<Meal>() {new Meal(MealTypes.Užkandžiai, "Rinkinys prie vyno", 9.50m),
-                                                     new Meal(MealTypes.Užkandžiai, "Silkės tartaras su baravykais", 6.50m),
-                                                     new Meal(MealTypes.Užkandžiai, "Kepta duona su sūrio padažu", 4.50m),
-                                                     new Meal(MealTypes.Salotos, "Cezario salotos su vištiena", 8.50m),
-                                                     new Meal(MealTypes.Salotos, "Cezario salotos su krevetėmis", 9.50m),
-                                                     new Meal(MealTypes.Karšti, "Dienos sriuba", 3.00m),
-                                                     new Meal(MealTypes.Karšti, "Šaltibaršciai su bulvemis", 4.00m),
-                                                     new Meal(MealTypes.Karšti, "Bulviniai blynai su sūdyta lašiša", 7.50m),
-                                                     new Meal(MealTypes.Karšti, "Mėsainis su plėšyta kiauliena", 8.00m),
-                                                     new Meal(MealTypes.Karšti, "Mėsainis su vištiena", 7.00m),
-                                                     new Meal(MealTypes.Karšti, "Kiaulienos išpjovos kepsneliai", 9.50m),
-                                                     new Meal(MealTypes.Karšti, "Vištienos kepsneliai", 8.50m),
-                                                     new Meal(MealTypes.Karšti, "Starkio užkepėlė", 10.50m),
-                                                     new Meal(MealTypes.Desertai, "Karštas obuolių pyragas su ledais", 4.00m),
-                                                     new Meal(MealTypes.Desertai, "Vaniliniai ledai su padažu", 4.00m),
-                                                     new Meal(MealTypes.Gėrimai, "Spanguolių arbata", 2.50m),
-                                                     new Meal(MealTypes.Gėrimai, "Kapučinas", 2.50m),
-                                                     new Meal(MealTypes.Gėrimai, "Kava su likeriu", 4.80m),
-                                                     new Meal(MealTypes.Gėrimai, "Sultys", 2.80m),
-                                                     new Meal(MealTypes.Gėrimai, "Alus", 4.50m),
-                                                     new Meal(MealTypes.Gėrimai, "Vynas", 2.80m)};
+        private List<Meal> FoodMenu = new List<Meal>() {new Meal(MealTypes.Užkandžiai, "Rinkinys prie vyno", 9.50m),
+                                                         new Meal(MealTypes.Užkandžiai, "Silkės tartaras su baravykais", 6.50m),
+                                                         new Meal(MealTypes.Užkandžiai, "Kepta duona su sūrio padažu", 4.50m),
+                                                         new Meal(MealTypes.Salotos, "Cezario salotos su vištiena", 8.50m),
+                                                         new Meal(MealTypes.Salotos, "Cezario salotos su krevetėmis", 9.50m),
+                                                         new Meal(MealTypes.Karšti, "Dienos sriuba", 3.00m),
+                                                         new Meal(MealTypes.Karšti, "Šaltibaršciai su bulvemis", 4.00m),
+                                                         new Meal(MealTypes.Karšti, "Bulviniai blynai su sūdyta lašiša", 7.50m),
+                                                         new Meal(MealTypes.Karšti, "Mėsainis su plėšyta kiauliena", 8.00m),
+                                                         new Meal(MealTypes.Karšti, "Mėsainis su vištiena", 7.00m),
+                                                         new Meal(MealTypes.Karšti, "Kiaulienos išpjovos kepsneliai", 9.50m),
+                                                         new Meal(MealTypes.Karšti, "Vištienos kepsneliai", 8.50m),
+                                                         new Meal(MealTypes.Karšti, "Starkio užkepėlė", 10.50m),
+                                                         new Meal(MealTypes.Desertai, "Karštas obuolių pyragas su ledais", 4.00m),
+                                                         new Meal(MealTypes.Desertai, "Vaniliniai ledai su padažu", 4.00m)};
 
-        internal void CreateTablesTable()
+
+        private List<Meal> DrinksMenu = new List<Meal>() {new Meal(MealTypes.Gėrimai, "Spanguolių arbata", 2.50m),
+                                                           new Meal(MealTypes.Gėrimai, "Kapučinas", 2.50m),
+                                                           new Meal(MealTypes.Gėrimai, "Kava su likeriu", 4.80m),
+                                                           new Meal(MealTypes.Gėrimai, "Sultys", 2.80m),
+                                                           new Meal(MealTypes.Gėrimai, "Alus", 4.50m),
+                                                           new Meal(MealTypes.Gėrimai, "Vynas", 2.80m)};
+
+        private void CreateTablesTable()
         {
             using SQLiteConnection ConnectionToDatabase = SqlService.CreateConnection();
             using SQLiteCommand SqlCommand = ConnectionToDatabase.CreateCommand();
@@ -62,32 +64,40 @@ namespace RestaurantSystem.Services
             }
         }
 
-        internal void CreateMenuTable()
+        private void CreateMenuTables()
+        {
+            string FoodTableName = "menuOfFood";
+            CreateMenuTable(FoodTableName, FoodMenu);
+            string DrinksTableName = "menuOfDrinks";
+            CreateMenuTable(DrinksTableName, DrinksMenu);
+        }
+
+        private void CreateMenuTable(string tableName, List<Meal> menu)
         {
             using SQLiteConnection ConnectionToDatabase = SqlService.CreateConnection();
             using SQLiteCommand SqlCommand = ConnectionToDatabase.CreateCommand();
-            SqlCommand.CommandText = $"SELECT COUNT(name) FROM sqlite_master WHERE type='table' AND name='menu';";
+            SqlCommand.CommandText = $"SELECT COUNT(name) FROM sqlite_master WHERE type='table' AND name='{tableName}';";
             bool isTableExist = Convert.ToBoolean(SqlCommand.ExecuteScalar());
             if (!isTableExist)
             {
-                SqlCommand.CommandText = $"CREATE TABLE menu (" +
+                SqlCommand.CommandText = $"CREATE TABLE {tableName} (" +
                                                         $"MealID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                                                         $"MealType TEXT(20), " +
                                                         $"MealName TEXT(100), " +
                                                         $"MealPrice REAL);";
                 SqlCommand.ExecuteNonQuery();
 
-                foreach (Meal meal in Menu)
+                foreach (Meal meal in menu)
                 {
                     string PriceAsRealNumber = Converter.ConvertDecimalToReal(meal.MealPrice);
                     string? MealType = Enum.GetName(typeof(MealTypes), meal.MealType);
-                    SqlCommand.CommandText = $"INSERT INTO Menu (MealType, MealName, MealPrice) VALUES ('{MealType}', '{meal.MealName}', {PriceAsRealNumber});";
+                    SqlCommand.CommandText = $"INSERT INTO {tableName} (MealType, MealName, MealPrice) VALUES ('{MealType}', '{meal.MealName}', {PriceAsRealNumber});";
                     SqlCommand.ExecuteNonQuery();
                 }
             }
         }
 
-        internal void CreateAccountingTable()
+        private void CreateAccountingTable()
         {
             using SQLiteConnection ConnectionToDatabase = SqlService.CreateConnection();
             using SQLiteCommand SqlCommand = ConnectionToDatabase.CreateCommand();
@@ -105,7 +115,7 @@ namespace RestaurantSystem.Services
             }
         }
 
-        internal void CreateClientsDataTable()
+        private void CreateClientsDataTable()
         {
             using SQLiteConnection ConnectionToDatabase = SqlService.CreateConnection();
             using SQLiteCommand SqlCommand = ConnectionToDatabase.CreateCommand();
@@ -120,7 +130,7 @@ namespace RestaurantSystem.Services
             }
         }
 
-        internal void CreateOrdersTable()
+        private void CreateOrdersTable()
         {
             using SQLiteConnection ConnectionToDatabase = SqlService.CreateConnection();
             using SQLiteCommand SqlCommand = ConnectionToDatabase.CreateCommand();
@@ -132,7 +142,8 @@ namespace RestaurantSystem.Services
                                                         $"OrderID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                                                         $"AccountingID INTEGER, " +
                                                         $"TableID INTEGER, " +
-                                                        $"MealID INTEGER, " +
+                                                        $"MealName TEXT, " +
+                                                        $"MealPrice REAL, " +
                                                         $"isPaid INTEGER DEFAULT 0);";
                 SqlCommand.ExecuteNonQuery();
             }
@@ -141,7 +152,7 @@ namespace RestaurantSystem.Services
         public void CreateDefaultSqlDatabase()
         {
             CreateTablesTable();
-            CreateMenuTable();
+            CreateMenuTables();
             CreateAccountingTable();
             CreateClientsDataTable();
             CreateOrdersTable();

@@ -55,8 +55,9 @@ namespace RestaurantSystem.Services
                 sTable Table = new sTable();
                 Table.TableID = Convert.ToInt32(SqlReader[0]);
                 Table.Seats = Convert.ToInt32(SqlReader[1]);
-                Table.isReserved = Convert.ToBoolean(SqlReader[2]);
-                Table.isOrdered = Convert.ToBoolean(SqlReader[3]);
+                Table.OccupiedSeats = Convert.ToInt32(SqlReader[2]);
+                Table.isReserved = Convert.ToBoolean(SqlReader[3]);
+                Table.isOrdered = Convert.ToBoolean(SqlReader[4]);
                 TableList.Add(Table);
             }
             return TableList;
@@ -69,6 +70,39 @@ namespace RestaurantSystem.Services
 
             SqlCommand.CommandText = sqlString;
             SqlCommand.ExecuteNonQuery();
+        }
+
+        public static List<MenuItem> RetreveMenu(string sqlString)
+        {
+            using SQLiteConnection ConnectToDatabase = CreateConnection();
+            using SQLiteCommand SQLCommand = ConnectToDatabase.CreateCommand();
+            List<MenuItem> MenuList = new List<MenuItem>();
+            SQLiteDataReader SqlReader;
+            SQLCommand.CommandText = sqlString;
+            SqlReader = SQLCommand.ExecuteReader();
+            while (SqlReader.Read())
+            {
+                MenuItem Item = new MenuItem();
+                Item.MealId = Convert.ToInt32(SqlReader[0]);
+                Item.MealType = Convert.ToString(SqlReader[1]);
+                Item.MealName = Convert.ToString(SqlReader[2]);
+                Item.MealPrice = Convert.ToInt32(SqlReader[3]);
+                MenuList.Add(Item);
+            }
+            return MenuList;
+        }
+
+        public static void WriteOrderToSql(int tableId, List<MenuItem> order)
+        {
+            using SQLiteConnection ConnectionToDatabase = CreateConnection();
+            using SQLiteCommand SQLCommand = ConnectionToDatabase.CreateCommand();
+            SQLCommand.CommandText = $"INSERT INTO accounting (Date) VALUES ('{DateTime.Today:yyyy-MM-dd}');";
+            SQLCommand.ExecuteNonQuery();
+            foreach (MenuItem o in order)
+            {
+                SQLCommand.CommandText = $"INSERT INTO orders (AccountingID, TableID, MealName, MealPrice) VALUES ((SELECT MAX(AccountingID) FROM accounting), {tableId}, '{o.MealName}', {o.MealPrice});";
+                SQLCommand.ExecuteNonQuery();
+            }
         }
     }
 }
