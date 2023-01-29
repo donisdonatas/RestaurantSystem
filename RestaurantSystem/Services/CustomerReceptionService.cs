@@ -1,7 +1,5 @@
 ﻿using RestaurantSystem.Strukts;
 using RestaurantSystem.Utilities;
-using RestaurantSystem.Extentions;
-using RestaurantSystem.Models;
 
 namespace RestaurantSystem.Services
 {

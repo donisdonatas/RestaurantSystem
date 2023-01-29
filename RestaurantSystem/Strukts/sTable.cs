@@ -7,6 +7,5 @@
         public int OccupiedSeats;
         public bool isReserved;
         public bool isOrdered;
-        public int AccountingID;
     }
 }

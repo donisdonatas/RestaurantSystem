@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using RestaurantSystem.Services;
 
 namespace RestaurantSystem.Utilities
 {
@@ -108,7 +104,8 @@ namespace RestaurantSystem.Utilities
                 {
                     int MenuID;
                     bool success = int.TryParse(str2, out MenuID);
-                    if (success && MenuID <= 21) // TODO: Čia 21 turėtų būti pakeistas į eilučių skaičių esančių meniu.
+                    CustomerOrderService Menu = new CustomerOrderService();
+                    if (success && MenuID <= Menu.GetMenu().Count)
                     {
                         MenuOrder.Add(MenuID);
                     }

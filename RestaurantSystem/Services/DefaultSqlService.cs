@@ -110,7 +110,7 @@ namespace RestaurantSystem.Services
                                                         $"Date TEXT(10), " +
                                                         $"Time TEXT(5), " +
                                                         $"Value REAL, " +
-                                                        $"ClientID INTEGER);";
+                                                        $"ClientEmail TEXT);";
                 SqlCommand.ExecuteNonQuery();
             }
         }
@@ -144,7 +144,7 @@ namespace RestaurantSystem.Services
                                                         $"TableID INTEGER, " +
                                                         $"MealName TEXT, " +
                                                         $"MealPrice REAL, " +
-                                                        $"isPaid INTEGER DEFAULT 0);";
+                                                        $"isPaid TEXT DEFAULT 'false');";
                 SqlCommand.ExecuteNonQuery();
             }
         }
@@ -154,7 +154,6 @@ namespace RestaurantSystem.Services
             CreateTablesTable();
             CreateMenuTables();
             CreateAccountingTable();
-            CreateClientsDataTable();
             CreateOrdersTable();
         }
     }

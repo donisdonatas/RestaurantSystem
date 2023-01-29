@@ -1,9 +1,4 @@
 ﻿using RestaurantSystem.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RestaurantSystem.Services
 {
@@ -40,10 +35,10 @@ namespace RestaurantSystem.Services
                         CustomerOrderService Order = new CustomerOrderService();
                         Order.InitializeOrder();
                         break;
-                    //case 3:
-                    //    CustomerCheckoutServices Checkout = new CustomerCheckoutServices();
-                    //    Checkout.InitializeCheckout();
-                    //    break;
+                    case 3:
+                        CustomerCheckoutService Checkout = new CustomerCheckoutService();
+                        Checkout.InitializeCheckout();
+                        break;
                     case 0:
                         Console.ForegroundColor = ConsoleColor.Blue;
                         Console.WriteLine("Viso gero.");

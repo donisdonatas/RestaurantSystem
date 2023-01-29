@@ -23,12 +23,12 @@ namespace RestaurantSystem.Services
         public static List<sTable> GetListOfTables()
         {
             using SQLiteConnection ConnectToDatabase = CreateConnection();
-            using SQLiteCommand SQLCommand = ConnectToDatabase.CreateCommand();
+            using SQLiteCommand SqlCommand = ConnectToDatabase.CreateCommand();
 
             List<sTable> FreeTableSeats = new List<sTable>();
             SQLiteDataReader SqlReader;
-            SQLCommand.CommandText = $"SELECT * FROM tables;";
-            SqlReader = SQLCommand.ExecuteReader();
+            SqlCommand.CommandText = $"SELECT * FROM tables;";
+            SqlReader = SqlCommand.ExecuteReader();
 
             while (SqlReader.Read())
             {
@@ -44,12 +44,12 @@ namespace RestaurantSystem.Services
         public static List<sTable> RetrieveTableList()
         {
             using SQLiteConnection ConnectToDatabase = CreateConnection();
-            using SQLiteCommand SQLCommand = ConnectToDatabase.CreateCommand();
+            using SQLiteCommand SqlCommand = ConnectToDatabase.CreateCommand();
 
             List<sTable> TableList = new List<sTable>();
             SQLiteDataReader SqlReader;
-            SQLCommand.CommandText = $"SELECT * FROM tables;";
-            SqlReader = SQLCommand.ExecuteReader();
+            SqlCommand.CommandText = $"SELECT * FROM tables;";
+            SqlReader = SqlCommand.ExecuteReader();
             while (SqlReader.Read())
             {
                 sTable Table = new sTable();
@@ -75,11 +75,11 @@ namespace RestaurantSystem.Services
         public static List<MenuItem> RetreveMenu(string sqlString)
         {
             using SQLiteConnection ConnectToDatabase = CreateConnection();
-            using SQLiteCommand SQLCommand = ConnectToDatabase.CreateCommand();
+            using SQLiteCommand SqlCommand = ConnectToDatabase.CreateCommand();
             List<MenuItem> MenuList = new List<MenuItem>();
             SQLiteDataReader SqlReader;
-            SQLCommand.CommandText = sqlString;
-            SqlReader = SQLCommand.ExecuteReader();
+            SqlCommand.CommandText = sqlString;
+            SqlReader = SqlCommand.ExecuteReader();
             while (SqlReader.Read())
             {
                 MenuItem Item = new MenuItem();
@@ -94,15 +94,49 @@ namespace RestaurantSystem.Services
 
         public static void WriteOrderToSql(int tableId, List<MenuItem> order)
         {
-            using SQLiteConnection ConnectionToDatabase = CreateConnection();
-            using SQLiteCommand SQLCommand = ConnectionToDatabase.CreateCommand();
-            SQLCommand.CommandText = $"INSERT INTO accounting (Date) VALUES ('{DateTime.Today:yyyy-MM-dd}');";
-            SQLCommand.ExecuteNonQuery();
+            using SQLiteConnection ConnectToDatabase = CreateConnection();
+            using SQLiteCommand SqlCommand = ConnectToDatabase.CreateCommand();
+            SqlCommand.CommandText = $"INSERT INTO accounting (Date) VALUES ('{DateTime.Today:yyyy-MM-dd}');";
+            SqlCommand.ExecuteNonQuery();
             foreach (MenuItem o in order)
             {
-                SQLCommand.CommandText = $"INSERT INTO orders (AccountingID, TableID, MealName, MealPrice) VALUES ((SELECT MAX(AccountingID) FROM accounting), {tableId}, '{o.MealName}', {o.MealPrice});";
-                SQLCommand.ExecuteNonQuery();
+                SqlCommand.CommandText = $"INSERT INTO orders (AccountingID, TableID, MealName, MealPrice) VALUES ((SELECT MAX(AccountingID) FROM accounting), {tableId}, '{o.MealName}', {o.MealPrice});";
+                SqlCommand.ExecuteNonQuery();
             }
+        }
+
+        public static List<MenuItem> GetOrderBillList(int tableId)
+        {
+            using SQLiteConnection ConnectToDatabase = CreateConnection();
+            using SQLiteCommand SqlCommand = ConnectToDatabase.CreateCommand();
+            List<MenuItem> OrderedItems = new List<MenuItem>();
+            SQLiteDataReader SQLiteReader;
+            SqlCommand.CommandText = $"SELECT MealName, MealPrice FROM orders WHERE TableID={tableId} AND isPaid='false';";
+            SQLiteReader = SqlCommand.ExecuteReader();
+            while (SQLiteReader.Read())
+            {
+                MenuItem Item = new MenuItem();
+                Item.MealName = Convert.ToString(SQLiteReader[0]);
+                Item.MealPrice = Convert.ToDecimal(SQLiteReader[1]);
+                OrderedItems.Add(Item);
+            }
+            return OrderedItems;
+        }
+
+        public static AccountingInfo GetOrderAccountingID(int tableId)
+        {
+            using SQLiteConnection ConnectToDatabase = CreateConnection();
+            using SQLiteCommand SqlCommand = ConnectToDatabase.CreateCommand();
+            SQLiteDataReader SQLiteReader;
+            SqlCommand.CommandText = $"SELECT AccountingID, Date FROM accounting WHERE AccountingID=(SELECT DISTINCT AccountingID FROM orders WHERE TableID={tableId} AND isPaid='false');";
+            SQLiteReader = SqlCommand.ExecuteReader();
+            AccountingInfo AccInfo = new AccountingInfo();
+            while (SQLiteReader.Read())
+            {
+                AccInfo.AccountingId = Convert.ToInt32(SQLiteReader[0]);
+                AccInfo.AccountingDate = Convert.ToString(SQLiteReader[1]);
+            }
+            return AccInfo;
         }
     }
 }

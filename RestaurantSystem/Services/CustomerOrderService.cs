@@ -1,7 +1,6 @@
 ﻿using RestaurantSystem.Utilities;
 using RestaurantSystem.Strukts;
 using RestaurantSystem.Extentions;
-using RestaurantSystem.Models;
 
 namespace RestaurantSystem.Services
 {
@@ -37,7 +36,7 @@ namespace RestaurantSystem.Services
                 foreach (sTable table in ReservedTables)
                 {
                     ++KeyboardKey;
-                    Console.WriteLine($"[{KeyboardKey}] Staliukas Nr. {table.TableID}. Laukia {table.OccupiedSeats} žmonės.");
+                    Console.WriteLine($"[{KeyboardKey}] Staliukas Nr. {table.TableID}. Laukia {table.OccupiedSeats} {(table.OccupiedSeats > 1 ? " žmonės" : " žmogus")}.");
                 }
                 Console.WriteLine("-----------------");
                 int Input = InputValidation.ValidateInput(ReservedTables.Count());
@@ -81,7 +80,7 @@ namespace RestaurantSystem.Services
             SelectMenuItems();
         }
 
-        private List<MenuItem> GetMenu()
+        public List<MenuItem> GetMenu()
         {
             List<MenuItem> Menu = new List<MenuItem>();
 
