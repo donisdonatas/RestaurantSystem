@@ -60,9 +60,6 @@ namespace RestaurantSystem.Services
 
         public void BackToMainMenu()
         {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Grįžti į pagrindinį meniu.");
-            Console.ReadLine();
             GetPrimaryMenu();
         }
     }

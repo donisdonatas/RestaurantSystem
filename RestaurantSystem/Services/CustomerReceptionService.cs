@@ -1,10 +1,5 @@
 ﻿using RestaurantSystem.Strukts;
 using RestaurantSystem.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RestaurantSystem.Services
 {
@@ -30,12 +25,12 @@ namespace RestaurantSystem.Services
                 case 1:
                     StartTableReservation();
                     break;
-                //case 2:
-                //    CancelReservation();
-                //    break;
+                case 2:
+                    CancelReservation();
+                    break;
                 case 3:
                     SystemMenu MainMenu = new SystemMenu();
-                    MainMenu.BackToMainMenu();
+                    MainMenu.GetPrimaryMenu();
                     break;
                 default:
                     Console.ForegroundColor = ConsoleColor.Red;
@@ -83,6 +78,35 @@ namespace RestaurantSystem.Services
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Nėra laisvo staliuko, tokiam žmonių kiekiui.");
             }
+        }
+
+        private void CancelReservation()
+        {
+            List<sTable> Tables = SqlService.RetrieveTableList();
+            IEnumerable<sTable> ReservedTables = Tables.Where(table => table.isReserved == true);
+            if (ReservedTables.Any())
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Pasirinkite iš sąrašo, kurį staliuką norite atrezervuoti:");
+                int KeyboardKey = 0;
+                foreach (sTable table in ReservedTables)
+                {
+                    ++KeyboardKey;
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.WriteLine($"[{KeyboardKey}] Staliuko numeris: {table.TableID}");
+                }
+                InputValidation.ValidateInput(KeyboardKey);
+                string SqlString = $"UPDATE tables SET isReserved='false', OccupiedSeats=0 WHERE TableID={ReservedTables.ElementAt(KeyboardKey - 1).TableID};";
+                SqlService.UpdateSqlTable(SqlString);
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"Staliukas Nr. {ReservedTables.ElementAt(KeyboardKey - 1).TableID} atrezervuotas.");
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine("Nėra galimų atlaisvinti staliukų.");
+            }
+            Console.ReadLine();
         }
     }
 }
