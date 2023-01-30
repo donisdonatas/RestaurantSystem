@@ -83,15 +83,12 @@ namespace RestaurantSystem.Services
         public List<MenuItem> GetMenu()
         {
             List<MenuItem> Menu = new List<MenuItem>();
-
-            string FoodSqlString = $"SELECT * FROM menuOfFood;";
-            List<MenuItem> FoodMenu = SqlService.RetreveMenu(FoodSqlString);
-            Menu.AddRange(FoodMenu);
-
-            string DrinksSqlString = $"SELECT * FROM menuOfDrinks;";
-            List<MenuItem> DrinksMenu = SqlService.RetreveMenu(DrinksSqlString);
-            Menu.AddRange(DrinksMenu);
-           
+            string[] MenuTables = { "menuOfFood", "menuOfDrinks" };
+            foreach (string table in MenuTables)
+            {
+                string SqlString = $"SELECT * FROM {table};";
+                Menu.AddRange(SqlService.RetreveMenu(SqlString));
+            }
             return Menu;
         }
 

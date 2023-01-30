@@ -1,9 +1,10 @@
 ﻿using System.Net.Mail;
 using System.Net;
+using RestaurantSystem.Interfaces;
 
 namespace RestaurantSystem.Services
 {
-    public class EmailService
+    public class EmailService : IEmailService
     {
         public void SendEmail(string mailContext, MailAddress recipientsEmail)
         {
